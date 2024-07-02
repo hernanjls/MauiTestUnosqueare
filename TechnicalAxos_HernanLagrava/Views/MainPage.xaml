@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TechnicalAxos_HernanLagrava.Views.MainPage"
+             xmlns:cn="clr-namespace:TechnicalAxos_HernanLagrava.Converters"
+             xmlns:model="clr-namespace:TechnicalAxos_HernanLagrava.Models"
+             xmlns:viewModels="clr-namespace:TechnicalAxos_HernanLagrava.ViewModels"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <cn:BoolToInverseVisibilityConverter x:Key="BoolToInverseVisibilityConverter" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="auto,auto,auto,auto,*" Padding="20" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+       
+        <Label
+            Grid.Row="0"
+            VerticalOptions="Start"
+            HorizontalOptions="FillAndExpand"
+            Text="{Binding BundleId}"
+            Style="{StaticResource SmallHeadline}"
+            SemanticProperties.HeadingLevel="Level1" />
+
+
+        <VerticalStackLayout
+            Grid.Row="1"
+            HorizontalOptions="FillAndExpand"
+            Padding="10"
+            HeightRequest="170">
+            
+            <ActivityIndicator IsRunning="{Binding LoadingImage}" IsVisible="{Binding LoadingImage}" HeightRequest="30"/>
+            <Image
+                x:Name="UploadedOrSelectedImage"
+                IsVisible="{Binding LoadingImage, Converter={StaticResource BoolToInverseVisibilityConverter}}"
+                Source="{Binding SourceImage, Mode=TwoWay}"
+                HeightRequest="165"
+                Aspect="AspectFit" />
+           
+        </VerticalStackLayout>
+
+        <Button
+            Grid.Row="2"
+            HeightRequest="40"
+            Text="Pick local image " 
+            Margin="0,10,0,10"
+            Command="{Binding PickImageCommand}"
+            HorizontalOptions="Fill" />
+
+        <Grid 
+            Grid.Row="3" 
+            Margin="0,0,0,5"
+            ColumnDefinitions="*,auto"
+            HorizontalOptions="FillAndExpand" 
+            BackgroundColor="Transparent">
+            
+            <Label Grid.Column="0" Text="Country List" HorizontalOptions="StartAndExpand"/>
+            
+            <Label Grid.Column="1" 
+                   Text="Reload" 
+                   TextColor="DodgerBlue" 
+                   IsVisible="{Binding VisibleRefresh}"
+                   HorizontalOptions="End">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ReloadCommand}"/>
+                </Label.GestureRecognizers>
+            </Label>
+            
+        </Grid>
+        
+        
+        <!-- Country List -->
+
+        <CollectionView 
+            Grid.Row="4"
+            IsVisible="{Binding LoadingList, Converter={StaticResource BoolToInverseVisibilityConverter}}"
+            VerticalOptions="FillAndExpand"
+            ItemsSource="{Binding CountryList}"
+            RemainingItemsThreshold="1" 
+            RemainingItemsThresholdReachedCommand="{Binding GetNextDataCommand}">
+
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout ItemSpacing="5" Orientation="Vertical"/>
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:CountryModel">
+                        <Border BackgroundColor="White" Padding="4">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="5"/>
+                            </Border.StrokeShape>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Grid.Column="0" Source="{Binding Flags.Png}" HeightRequest="40" WidthRequest="60" VerticalOptions="Center"/>
+
+                            <VerticalStackLayout Grid.Column="1">
+
+                                <Label Text="{Binding Name.Common}" FontSize="Medium"  VerticalOptions="Center" Margin="10,0,0,10" TextColor="DodgerBlue"/>
+                                
+                                <HorizontalStackLayout Margin="10,0,0,0">
+                                    <Label Text="Region: " FontAttributes="Bold" FontSize="Small"/>
+                                    <Label Text="{Binding Region}" FontSize="Small" VerticalOptions="Center" Margin="10,0,0,0" TextColor="Black"/>
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Margin="10,0,0,0">
+                                    <Label Text="Population: " FontAttributes="Bold" FontSize="Small"/>
+                                    <Label Text="{Binding Population, StringFormat='{0:N0}'}" FontSize="Small" VerticalOptions="Center" Margin="10,0,0,0" TextColor="Black"/>
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Margin="10,0,0,0">
+                                    <Label Text="Languages: " FontAttributes="Bold" FontSize="Small"/>
+                                    <Label Text="{Binding LanguagesDisplay}" FontSize="Small" VerticalOptions="Center" Margin="10,0,0,0" TextColor="Black"/>
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                                
+                                
+                            </Grid>
+                        </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.Footer>
+                <StackLayout BackgroundColor="Transparent">
+                    <ActivityIndicator IsRunning="True" IsVisible="{Binding LoadingNext}" HeightRequest="30"/>
+                </StackLayout>
+            </CollectionView.Footer>
+            
+        </CollectionView>
+
+        <ActivityIndicator Grid.Row="4"  IsRunning="{Binding LoadingList}" IsVisible="{Binding LoadingList}" HeightRequest="30"/>
+
+    </Grid>
+
+</ContentPage>
